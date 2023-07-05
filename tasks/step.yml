@@ -1,0 +1,55 @@
+---
+# Get cli latest version
+- name: Get the latest version
+  when: (step_cli_version is not defined) or (step_cli_version == 'latest')
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Determine cli latest GitHub release (local).
+      become: false
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/{{ step_cli_repo }}/releases/latest
+        body_format: json
+      register: _github_release_cli
+      until: _github_release_cli.status == 200
+      retries: 5
+
+    - name: Set step_cli_version.
+      ansible.builtin.set_fact:
+        step_cli_version: "{{ _github_release.json.tag_name }}"
+
+- name: Test if step is already installed.
+  ansible.builtin.stat:
+    path: /usr/local/bin/step
+  register: step
+
+- name: Get installed version.
+  ansible.builtin.command:
+    cmd: /usr/local/bin/step version
+  changed_when: false
+  register: step_cli_ver
+  when:
+    - step.stat.executable is defined
+    - step.stat.executable
+
+- name: Parse version string.
+  ansible.builtin.set_fact:
+    # yamllint disable-line rule:quoted-strings
+    step_cli_installed_version: "v{{ step_cli_ver.stdout | regex_search('Smallstep CLI/([^ ]+)', '\\1') | first }}"
+  when:
+    - step_cli_ver.rc is defined
+    - step_cli_ver.rc == 0
+
+- name: Download step.
+  ansible.builtin.unarchive:
+    src: https://github.com/{{ step_cli_repo }}/releases/download/{{ step_cli_version }}/step_linux_{{ step_cli_version | regex_replace("^v", "") }}_{{ go_arch }}.tar.gz
+    dest: /usr/local/bin/
+    extra_opts:
+      - --strip-components=2
+      - --wildcards
+      - '*/bin/step'
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0755'
+  when: step_cli_installed_version is not defined or step_cli_installed_version != step_cli_version

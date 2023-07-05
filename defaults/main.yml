@@ -1,2 +1,5 @@
 ---
 # defaults file for step
+step_org: smallstep
+step_cli_repo: '{{ step_org }}/cli'
+step_ca_repo: '{{ step_org }}/certificates'

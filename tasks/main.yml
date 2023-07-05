@@ -1,2 +1,3 @@
 ---
-# tasks file for step
+- name: Install step cli.
+  ansible.builtin.include_tasks: step.yml
