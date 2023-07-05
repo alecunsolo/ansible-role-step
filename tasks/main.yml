@@ -1,3 +1,6 @@
 ---
 - name: Install step cli.
-  ansible.builtin.include_tasks: step.yml
+  ansible.builtin.include_tasks: install-step.yml
+
+- name: Install step ca.
+  ansible.builtin.include_tasks: install-step-ca.yml

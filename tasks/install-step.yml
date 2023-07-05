@@ -16,7 +16,7 @@
 
     - name: Set step_cli_version.
       ansible.builtin.set_fact:
-        step_cli_version: "{{ _github_release.json.tag_name }}"
+        step_cli_version: "{{ _github_release_cli.json.tag_name }}"
 
 - name: Test if step is already installed.
   ansible.builtin.stat:

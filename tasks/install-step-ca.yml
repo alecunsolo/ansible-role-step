@@ -1,0 +1,55 @@
+---
+# Get ca latest version
+- name: Get the latest version.
+  when: (step_ca_version is not defined) or (step_ca_version == 'latest')
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Determine ca latest GitHub release (local).
+      become: false
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/{{ step_ca_repo }}/releases/latest
+        body_format: json
+      register: _github_release_ca
+      until: _github_release_ca.status == 200
+      retries: 5
+
+    - name: Set step_ca_version.
+      ansible.builtin.set_fact:
+        step_ca_version: "{{ _github_release_ca.json.tag_name }}"
+
+- name: Test if step is already installed.
+  ansible.builtin.stat:
+    path: /usr/local/bin/step-ca
+  register: step_ca
+
+- name: Get installed version.
+  ansible.builtin.command:
+    cmd: /usr/local/bin/step-ca version
+  changed_when: false
+  register: step_ca_ver
+  when:
+    - step_ca.stat.executable is defined
+    - step_ca.stat.executable
+
+- name: Parse version string.
+  ansible.builtin.set_fact:
+    # yamllint disable-line rule:quoted-strings
+    step_ca_installed_version: "v{{ step_ca_ver.stdout | regex_search('Smallstep CA/([^ ]+)', '\\1') | first }}"
+  when:
+    - step_ca_ver.rc is defined
+    - step_ca_ver.rc == 0
+
+- name: Download step-ca.
+  ansible.builtin.unarchive:
+    src: https://github.com/{{ step_ca_repo }}/releases/download/{{ step_ca_version }}/step-ca_linux_{{ step_ca_version | regex_replace("^v", "") }}_{{ go_arch }}.tar.gz
+    dest: /usr/local/bin/
+    extra_opts:
+      - --strip-components=1
+      - --wildcards
+      - '*/step-ca'
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0755'
+  when: step_ca_installed_version is not defined or step_ca_installed_version != step_ca_version
