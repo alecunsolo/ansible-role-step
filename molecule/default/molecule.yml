@@ -1,0 +1,19 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: bookworm
+    image: ghcr.io/alecunsolo/bookworm-base-systemd:latest
+    pre_build_image: true
+  - name: bullseye
+    image: ghcr.io/alecunsolo/bullseye-base-systemd:latest
+    pre_build_image: true
+  - name: ubuntu2204
+    image: ghcr.io/alecunsolo/ubuntu2204-base-systemd:latest
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
