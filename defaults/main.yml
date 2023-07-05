@@ -3,3 +3,9 @@
 step_org: smallstep
 step_cli_repo: '{{ step_org }}/cli'
 step_ca_repo: '{{ step_org }}/certificates'
+
+step_server_prepare: false
+step_server_user: step
+step_server_conf_dir: /etc/step
+step_server_systemd_unit: step-ca.service.j2
+step_server_default_dir: /etc/default
