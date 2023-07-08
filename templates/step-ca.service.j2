@@ -14,9 +14,9 @@ Type=simple
 User={{ step_server_user }}
 Group={{ step_server_user }}
 Environment=STEPPATH={{ step_server_conf_dir }}
-EnvironmentFile={{ step_server_default_dir }}/step-ca
+EnvironmentFile=-{{ step_server_default_dir }}/step-ca
 WorkingDirectory={{ step_server_conf_dir }}
-ExecStart=/usr/bin/local/step-ca \
+ExecStart=/usr/local/bin/step-ca \
     {{ step_server_conf_dir }}/config/ca.json \
     --password-file {{ step_server_conf_dir }}/password.txt \
     $STEPCA_OPTS
