@@ -18,7 +18,7 @@ EnvironmentFile=-{{ step_server_default_dir }}/step-ca
 WorkingDirectory={{ step_server_conf_dir }}
 ExecStart=/usr/local/bin/step-ca \
     {{ step_server_conf_dir }}/config/ca.json \
-    --password-file {{ step_server_conf_dir }}/password.txt \
+    --password-file {{ step_server_pwd_file }} \
     $STEPCA_OPTS
 ExecReload=/bin/kill --signal HUP $MAINPID
 Restart=on-failure

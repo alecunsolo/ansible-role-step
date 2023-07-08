@@ -13,7 +13,7 @@
     state: directory
     owner: root
     group: '{{ step_server_user }}'
-    mode: '0750'
+    mode: '0770'
 
 - name: Add systemd unit.
   ansible.builtin.template:
@@ -41,3 +41,7 @@
   when:
     - step_server_additional_options is defined
     - (step_server_additional_options | length) > 0
+
+- name: Bootstrap CA.
+  ansible.builtin.include_tasks: bootstrap-ca-server.yml
+  when: step_server_bootstrap
