@@ -1,2 +1,20 @@
 ---
 # defaults file for step
+step_org: smallstep
+step_cli_repo: '{{ step_org }}/cli'
+step_ca_repo: '{{ step_org }}/certificates'
+
+# Preparation
+step_server_prepare: false
+step_server_user: step
+step_server_conf_dir: /etc/step
+step_server_systemd_unit: step-ca.service.j2
+step_server_default_dir: /etc/default
+step_server_pwd_file: '{{ step_server_conf_dir }}/password.txt'
+
+# Bootstrap
+step_server_bootstrap: false
+step_server_ca_name: Automatic CA
+step_server_ca_dns: [localhost]
+step_server_ca_address: 0.0.0.0:443
+step_server_ca_provisioner: bootstrap

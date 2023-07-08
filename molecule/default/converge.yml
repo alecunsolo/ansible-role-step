@@ -1,6 +1,12 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    step_server_prepare: true
+    step_server_bootstrap: true
+    step_server_additional_options: |
+      # Test file
+      UNUSED_STEP_OPTION=aaa
   tasks:
     - name: Include step.
       ansible.builtin.include_role:

@@ -1,2 +1,10 @@
 ---
-# tasks file for step
+- name: Install step cli.
+  ansible.builtin.include_tasks: install-step.yml
+
+- name: Install step ca.
+  ansible.builtin.include_tasks: install-step-ca.yml
+
+- name: Prepare CA service.
+  ansible.builtin.include_tasks: prepare-ca-server.yml
+  when: step_server_prepare

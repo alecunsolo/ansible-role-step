@@ -7,12 +7,15 @@ platforms:
   - name: bookworm
     image: ghcr.io/alecunsolo/bookworm-base-systemd:latest
     pre_build_image: true
+    command: /lib/systemd/systemd
   - name: bullseye
     image: ghcr.io/alecunsolo/bullseye-base-systemd:latest
     pre_build_image: true
+    command: /lib/systemd/systemd
   - name: ubuntu2204
     image: ghcr.io/alecunsolo/ubuntu2204-base-systemd:latest
     pre_build_image: true
+    command: /lib/systemd/systemd
 provisioner:
   name: ansible
 verifier:

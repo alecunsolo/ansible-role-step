@@ -1,0 +1,47 @@
+---
+- name: Ensure server user exists.
+  ansible.builtin.user:
+    name: '{{ step_server_user }}'
+    create_home: false
+    shell: /bin/false
+    system: true
+    home: /not/exists
+
+- name: Ensure config directory exists.
+  ansible.builtin.file:
+    path: '{{ step_server_conf_dir }}'
+    state: directory
+    owner: root
+    group: '{{ step_server_user }}'
+    mode: '0770'
+
+- name: Add systemd unit.
+  ansible.builtin.template:
+    src: '{{ step_server_systemd_unit }}'
+    dest: /etc/systemd/system/step-ca.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure folder for default options exists.
+  ansible.builtin.file:
+    path: '{{ step_server_default_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure additional service options.
+  ansible.builtin.copy:
+    dest: '{{ step_server_default_dir }}/step-ca'
+    content: '{{ step_server_additional_options }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - step_server_additional_options is defined
+    - (step_server_additional_options | length) > 0
+
+- name: Bootstrap CA.
+  ansible.builtin.include_tasks: bootstrap-ca-server.yml
+  when: step_server_bootstrap

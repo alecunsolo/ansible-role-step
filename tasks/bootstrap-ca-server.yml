@@ -1,0 +1,32 @@
+---
+- name: Generate random password.
+  ansible.builtin.set_fact:
+    step_server_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', seed=inventory_hostname, length=20) }}"
+  when: (step_server_ca_password is not defined) or
+        (step_server_ca_password | length) == 0
+
+- name: Ensure password file exists.
+  ansible.builtin.copy:
+    dest: '{{ step_server_pwd_file }}'
+    content: '{{ step_server_ca_password }}'
+    owner: root
+    group: '{{ step_server_user }}'
+    mode: '0640'
+
+- name: Bootstrap CA infrastructure.
+  become: yes
+  become_user: '{{ step_server_user }}'
+  environment:
+    STEPPATH: '{{ step_server_conf_dir }}'
+  ansible.builtin.command:
+    cmd: >-
+      step ca init
+      --deployment-type=standalone
+      --name="{{ step_server_ca_name }}"
+      {% for dns in step_server_ca_dns %}
+      --dns={{ dns }}
+      {% endfor %}
+      --address={{ step_server_ca_address }}
+      --password-file={{ step_server_pwd_file }}
+      --provisioner={{ step_server_ca_provisioner }}
+    creates: '{{ step_server_conf_dir }}/config/ca.json'

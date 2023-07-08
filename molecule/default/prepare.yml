@@ -7,3 +7,8 @@
         update_cache: yes
         cache_valid_time: 3600
       when: ansible_os_family | lower == "debian"
+    - name: Install packages needed for `become`.
+      ansible.builtin.package:
+        name: [sudo, acl]
+        state: present
+      when: ansible_os_family | lower == "debian"
